@@ -1,0 +1,28 @@
+from rest_framework import serializers
+from .models import User
+from .common import hash_password
+
+class GreetSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, min_length=6)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'role', 'first_name', 'second_name']
+        extra_kwargs = {
+            'first_name': {'required': False},
+            'second_name': {'required': False}
+        }
+
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            password_hash=hash_password(validated_data['password']),
+            role=validated_data['role'],
+            first_name=validated_data['first_name'],
+            second_name=validated_data['second_name']
+        )
+        return user
