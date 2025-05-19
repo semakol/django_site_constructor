@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import GreetSerializer, RegisterSerializer
+from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer
 from .models import User
 
 
@@ -57,3 +57,19 @@ class RegisterView(APIView):
 class AuthView(APIView):
     def get(self, request):
         serializer = RegisterSerializer(data=request.data)
+
+
+class SampleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = SampleSerializer(data=request.data)
+        if serializer.is_valid():
+            sample = serializer.save()
+            return Response({
+                "status": "ok"
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        pass

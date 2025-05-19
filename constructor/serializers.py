@@ -1,5 +1,7 @@
+import datetime
+
 from rest_framework import serializers
-from .models import User
+from .models import User, Sample
 from .common import hash_password
 
 class GreetSerializer(serializers.Serializer):
@@ -16,6 +18,26 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)
         return user
+
+
+class SampleSerializer(serializers.ModelSerializer):
+    sample_data = serializers.CharField(required=False)
+
+    class Meta:
+        model = Sample
+        fields = ['sample_data', 'name', 'state']
+
+    def create(self, validated_data):
+        sample = Sample.objects.create(
+            name = validated_data['name'],
+            data = validated_data['sample_data'],
+            state = validated_data['state'],
+            date_create = datetime.datetime.utcnow(),
+            date_update = datetime.datetime.utcnow()
+        )
+        return sample
+
+
 
 # class RegisterSerializer(serializers.ModelSerializer):
 #     password = serializers.CharField(write_only=True, required=True, min_length=6)

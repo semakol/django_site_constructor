@@ -12,7 +12,7 @@ sample_states = (
 
 class Sample(models.Model):
     id = models.AutoField(primary_key=True)
-    data = models.DateTimeField()
+    data = models.TextField()
     name = models.CharField()
     state = models.CharField(choices=sample_states)
     date_create = models.DateTimeField()
