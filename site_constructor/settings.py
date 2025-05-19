@@ -19,8 +19,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-from django.conf.global_settings import MEDIA_ROOT
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'constructor',
     'rest_framework',
+    'corsheaders',
     'rest_framework.authtoken'
 ]
 
@@ -59,7 +58,12 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'constructor.User'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Укажите порт, на котором работает ваш фронтенд
+]
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
