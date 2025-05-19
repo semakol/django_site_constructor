@@ -39,7 +39,6 @@ class GreetView(APIView):
             return Response({"message": f"Hello, {name}!"})
         return Response(serializer.errors, status=400)
 
-@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -54,3 +53,7 @@ class RegisterView(APIView):
                 "access": str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AuthView(APIView):
+    def get(self, request):
+        serializer = RegisterSerializer(data=request.data)
