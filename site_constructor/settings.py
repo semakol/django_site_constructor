@@ -35,7 +35,9 @@ SECRET_KEY = 'django-insecure-#-)q&i(0@0ox-f8%@&2zc%0d!^q$qtg##b4cpxj1_4&3yjp5!d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS' ,default=[
+    '*',  # Укажите порт, на котором работает ваш фронтенд
+], cast=json.loads)
 
 
 # Application definition
