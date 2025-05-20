@@ -9,6 +9,9 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+import json
+
+from decouple import config
 
 from pathlib import Path
 
@@ -58,9 +61,9 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'constructor.User'
 
-CORS_ALLOWED_ORIGINS = [
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS' ,default=[
     "http://localhost:5173",  # Укажите порт, на котором работает ваш фронтенд
-]
+], cast=json.loads)
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -99,9 +102,9 @@ WSGI_APPLICATION = 'site_constructor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'site-constructor2',
-        'USER': 'postgres',
-        'PASSWORD': '12345',
+        'NAME': config('DATABASE_NAME', default='site-constructor2'),
+        'USER': config('DATABASE_USER', default='postgres'),
+        'PASSWORD': config('DATABASE_PASSWORD', '12345'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -148,3 +151,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
