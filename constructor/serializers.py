@@ -21,17 +21,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class SampleSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
     sample_data = serializers.CharField(required=False)
 
     class Meta:
         model = Sample
-        fields = ['sample_data', 'name', 'state']
+        fields = ['sample_data', 'name', 'state', 'image']
 
     def create(self, validated_data):
         sample = Sample.objects.create(
             name = validated_data['name'],
             data = validated_data['sample_data'],
             state = validated_data['state'],
+            image = validated_data['image'],
             date_create = datetime.datetime.utcnow(),
             date_update = datetime.datetime.utcnow()
         )

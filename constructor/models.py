@@ -7,7 +7,8 @@ from django.db import models
 sample_states = (
     ('open', 'Опубликована'),
     ('close', 'Закрыта'),
-    ('delete', 'Удалена')
+    ('delete', 'Удалена'),
+    ('temp', 'Шаблон')
 )
 
 class Sample(models.Model):
