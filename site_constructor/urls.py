@@ -27,10 +27,10 @@ from rest_framework_simplejwt.views import (
 from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('greet/', GreetView.as_view(), name='greet'),
-    path('register/', RegisterView.as_view(), name='register'),
-    path('sample/', SampleView.as_view(), name='sample'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('admin', admin.site.urls),
+    path('greet', GreetView.as_view(), name='greet'),
+    path('register', RegisterView.as_view(), name='register'),
+    path('sample', SampleView.as_view(), name='sample'),
+    path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

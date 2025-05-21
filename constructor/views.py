@@ -39,6 +39,9 @@ class GreetView(APIView):
             return Response({"message": f"Hello, {name}!"})
         return Response(serializer.errors, status=400)
 
+# class ImageViev(APIView):
+
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -73,3 +76,4 @@ class SampleView(APIView):
 
     def patch(self, request):
         pass
+

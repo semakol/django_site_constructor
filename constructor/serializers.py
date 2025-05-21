@@ -21,7 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class SampleSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True)
+    image = serializers.ImageField(use_url=True, required=False, default='')
     sample_data = serializers.CharField(required=False)
 
     class Meta:

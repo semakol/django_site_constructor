@@ -18,7 +18,7 @@ class Sample(models.Model):
     state = models.CharField(choices=sample_states)
     date_create = models.DateTimeField()
     date_update = models.DateTimeField(null=True)
-    image = models.ImageField(upload_to='media/images/', null=True)
+    image = models.ImageField(upload_to='media/images/', null=True, blank=True)
 
 roles = (
     ('redactor', 'Редактор'),
