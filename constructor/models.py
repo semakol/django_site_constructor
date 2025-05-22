@@ -41,6 +41,8 @@ class User(AbstractBaseUser):
     role = models.CharField(choices=roles)
     first_name = models.CharField(null=True)
     second_name = models.CharField(null=True)
+    is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
