@@ -12,7 +12,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer
-from .models import User, SampleUser, Sample
+from .models import SampleUser, Sample
+from django.contrib.auth.models import User
 
 
 

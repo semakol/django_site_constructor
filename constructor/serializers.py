@@ -1,7 +1,8 @@
 import datetime
 
 from rest_framework import serializers
-from .models import User, Sample, SampleUser
+from .models import Sample, SampleUser
+from django.contrib.auth.models import User
 from .common import hash_password
 
 class GreetSerializer(serializers.Serializer):

@@ -61,8 +61,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_USER_MODEL = 'constructor.User'
-
 # APPEND_SLASH=False
 
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS' ,default=[
