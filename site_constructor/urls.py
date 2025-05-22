@@ -27,7 +27,7 @@ from rest_framework_simplejwt.views import (
 from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
-    path('admin', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('greet', GreetView.as_view(), name='greet'),
     path('register', RegisterView.as_view(), name='register'),
     path('sample', SampleView.as_view(), name='sample'),
