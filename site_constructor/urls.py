@@ -28,11 +28,11 @@ from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('greet', GreetView.as_view(), name='greet'),
-    path('register', RegisterView.as_view(), name='register'),
-    path('sample', SampleView.as_view(), name='sample'),
-    path('sample/<int:id>', SampleView.as_view(), name='sample_get'),
-    path('sample/list', SampleView.as_view(), name='sample_list'),
-    path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('greet', GreetView.as_view(), name='greet'),
+    path('api/register', RegisterView.as_view(), name='register'),
+    path('api/sample', SampleView.as_view(), name='sample'),
+    path('api/sample/<int:id>', SampleView.as_view(), name='sample_get'),
+    path('api/sample/list', SampleView.as_view(), name='sample_list'),
+    path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
