@@ -18,7 +18,7 @@ class Sample(models.Model):
     state = models.CharField(choices=sample_states)
     date_create = models.DateTimeField()
     date_update = models.DateTimeField(null=True)
-    image = models.ImageField(upload_to='media/images/', null=True, blank=True)
+    image = models.ImageField(upload_to='media/images/', null=True)
 
 roles = (
     ('redactor', 'Редактор'),
@@ -50,9 +50,13 @@ class User(AbstractBaseUser):
     def __str__(self):
         return f'{self.first_name} {self.second_name}'
 
+relations_choise = {
+    ('Создатель', 'creator')
+}
+
 class SampleUser(models.Model):
     id = models.AutoField(primary_key=True)
-    relation = models.CharField()
+    relation = models.CharField(choices=relations_choise)
 
     user_id = models.ForeignKey('User', models.DO_NOTHING)
     sample = models.ForeignKey('Sample', models.DO_NOTHING)

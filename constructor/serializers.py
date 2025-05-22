@@ -1,7 +1,7 @@
 import datetime
 
 from rest_framework import serializers
-from .models import User, Sample
+from .models import User, Sample, SampleUser
 from .common import hash_password
 
 class GreetSerializer(serializers.Serializer):
@@ -23,10 +23,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 class SampleSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, required=False, default='')
     sample_data = serializers.CharField(required=False)
+    user_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Sample
-        fields = ['sample_data', 'name', 'state', 'image']
+        fields = ['sample_data', 'name', 'state', 'image', 'user_id']
 
     def create(self, validated_data):
         sample = Sample.objects.create(
@@ -36,6 +37,12 @@ class SampleSerializer(serializers.ModelSerializer):
             image = validated_data['image'],
             date_create = datetime.datetime.utcnow(),
             date_update = datetime.datetime.utcnow()
+        )
+        user = User.objects.get(id=validated_data['user_id'])
+        sampleUser = SampleUser.objects.create(
+            relation = 'creator',
+            user_id = user,
+            sample = sample
         )
         return sample
 

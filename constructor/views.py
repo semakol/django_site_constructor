@@ -1,3 +1,5 @@
+from random import sample
+
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer
-from .models import User
+from .models import User, SampleUser, Sample
 
 
 
@@ -66,7 +68,8 @@ class SampleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = SampleSerializer(data=request.data)
+        user_id = request.user.id
+        serializer = SampleSerializer(data=request.data | {"user_id": user_id})
         if serializer.is_valid():
             sample = serializer.save()
             return Response({
@@ -77,3 +80,19 @@ class SampleView(APIView):
     def patch(self, request):
         pass
 
+    def get(self, request, id = None):
+        if id:
+            sample = 1
+            pass
+        else:
+            user = request.user
+            samples = Sample.objects.filter(sampleuser__user_id=user.id)
+            response_data = [
+                {
+                    "name": sample.name,
+                    "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
+                    "state": sample.state,
+                }
+                for sample in samples
+            ]
+            return Response(response_data, status=status.HTTP_200_OK)
