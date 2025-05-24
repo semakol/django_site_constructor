@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, viewsets, status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -67,10 +68,11 @@ class AuthView(APIView):
 
 class SampleView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
         user_id = request.user.id
-        serializer = SampleSerializer(data=request.data | {"user_id": user_id})
+        serializer = SampleSerializer(data=request.data.dict() | {"user_id": user_id})
         if serializer.is_valid():
             sample = serializer.save()
             return Response({
