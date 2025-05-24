@@ -91,15 +91,13 @@ class SampleView(APIView):
             if not sampleUser:
                 return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
             sample = Sample.objects.get(id = id)
-            response_data = [
-                {
+            response_data = {
                     "id": sample.id,
                     "name": sample.name,
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
                     "state": sample.state,
                     "sample_data": sample.data
                 }
-            ]
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             user = request.user
