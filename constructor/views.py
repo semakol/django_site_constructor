@@ -76,7 +76,8 @@ class SampleView(APIView):
         if serializer.is_valid():
             sample = serializer.save()
             return Response({
-                "status": "ok"
+                "status": "ok",
+                "id": sample.id
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,8 +86,21 @@ class SampleView(APIView):
 
     def get(self, request, id = None):
         if id:
-            sample = 1
-            pass
+            user = request.user
+            sampleUser = SampleUser.objects.filter(user_id=user.id, sample=id)
+            if not sampleUser:
+                return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
+            sample = Sample.objects.get(id = id)
+            response_data = [
+                {
+                    "id": sample.id,
+                    "name": sample.name,
+                    "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
+                    "state": sample.state,
+                    "sample_data": sample.data
+                }
+            ]
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             user = request.user
             samples = Sample.objects.filter(sampleuser__user_id=user.id)
