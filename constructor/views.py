@@ -92,6 +92,7 @@ class SampleView(APIView):
             samples = Sample.objects.filter(sampleuser__user_id=user.id)
             response_data = [
                 {
+                    "id": sample.id,
                     "name": sample.name,
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
                     "state": sample.state,
