@@ -5,14 +5,14 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, viewsets, status
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer, ImageSerializer
+from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer, ImageSerializer, SampleStateSerializer
 from .models import SampleUser, Sample, Image
 from django.contrib.auth.models import User
 
@@ -68,7 +68,7 @@ class AuthView(APIView):
 
 class SampleView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def post(self, request):
         user_id = request.user.id
@@ -82,7 +82,29 @@ class SampleView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
-        pass
+        path = request.path
+        user = request.user
+        sampleUser = SampleUser.objects.filter(user_id=user.id, sample=request.data["id"])
+        if not sampleUser:
+            return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
+        sample = Sample.objects.get(id=request.data["id"])
+        if 'state' in path:
+            serializer = SampleStateSerializer(data=request.data, instance=sample)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    "status": "ok",
+                    "id": sample.id
+                }, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = SampleSerializer(data=request.data, instance=sample)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status": "ok",
+                "id": sample.id
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, id = None):
         if id:

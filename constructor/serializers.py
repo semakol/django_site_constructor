@@ -1,4 +1,5 @@
 import datetime
+from random import sample
 
 from rest_framework import serializers
 from .models import Sample, SampleUser, Image
@@ -49,6 +50,26 @@ class SampleSerializer(serializers.ModelSerializer):
             sample = sample
         )
         return sample
+
+    def update(self, instance, validated_data):
+        sample = Sample.objects.update(
+            name = validated_data['name'],
+            data = validated_data['sample_data'],
+            state = validated_data['state'],
+            image = validated_data['image'],
+            date_update = datetime.datetime.utcnow()
+        )
+        return sample
+
+class SampleStateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sample
+        fields = ['state']
+
+    def update(self, instance, validated_data):
+        Sample.objects.update(**validated_data)
+        return instance
 
 class ImageSerializer(serializers.ModelSerializer):
 
