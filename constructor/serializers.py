@@ -28,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class SampleSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, required=False, default='')
     sample_data = serializers.CharField(required=False)
-    user_id = serializers.IntegerField(required=True)
+    user_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Sample
@@ -52,14 +52,16 @@ class SampleSerializer(serializers.ModelSerializer):
         return sample
 
     def update(self, instance, validated_data):
-        sample = Sample.objects.update(
-            name = validated_data['name'],
-            data = validated_data['sample_data'],
-            state = validated_data['state'],
-            image = validated_data['image'],
-            date_update = datetime.datetime.utcnow()
-        )
-        return sample
+        for key, item in validated_data.items():
+            if key == 'sample_data':
+                setattr(instance, 'data', item)
+            elif key == 'image' and item == '' or key == 'user_id':
+                continue
+            else:
+                setattr(instance, key, item)
+        instance.date_update = datetime.datetime.utcnow()
+        instance.save()
+        return instance
 
 class SampleStateSerializer(serializers.ModelSerializer):
 
@@ -68,7 +70,8 @@ class SampleStateSerializer(serializers.ModelSerializer):
         fields = ['state']
 
     def update(self, instance, validated_data):
-        Sample.objects.update(**validated_data)
+        instance.state = validated_data['state']
+        instance.save()
         return instance
 
 class ImageSerializer(serializers.ModelSerializer):
