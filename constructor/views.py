@@ -112,3 +112,17 @@ class SampleView(APIView):
                 for sample in samples
             ]
             return Response(response_data, status=status.HTTP_200_OK)
+
+class SamplesView(APIView):
+    def get(self, request):
+        samples = Sample.objects.filter(state='open').all()
+        response_data = [
+            {
+                "id": sample.id,
+                "name": sample.name,
+                "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
+                "state": sample.state
+            }
+            for sample in samples
+        ]
+        return Response(response_data, status=status.HTTP_200_OK)
