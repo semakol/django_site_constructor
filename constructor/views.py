@@ -12,8 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer
-from .models import SampleUser, Sample
+from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer, ImageSerializer
+from .models import SampleUser, Sample, Image
 from django.contrib.auth.models import User
 
 
@@ -126,3 +126,16 @@ class SamplesView(APIView):
             for sample in samples
         ]
         return Response(response_data, status=status.HTTP_200_OK)
+
+class ImageView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            image = serializer.save()
+            return Response(data={
+                "image": image.image.url
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

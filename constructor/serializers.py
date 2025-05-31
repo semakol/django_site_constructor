@@ -1,7 +1,7 @@
 import datetime
 
 from rest_framework import serializers
-from .models import Sample, SampleUser
+from .models import Sample, SampleUser, Image
 from django.contrib.auth.models import User
 from .common import hash_password
 
@@ -50,6 +50,15 @@ class SampleSerializer(serializers.ModelSerializer):
         )
         return sample
 
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = '__all__'
+
+    def create(self, validated_data):
+        image = Image.objects.create(**validated_data)
+        return image
 
 
 # class RegisterSerializer(serializers.ModelSerializer):

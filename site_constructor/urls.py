@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from constructor.views import RegisterView, GreetView, SampleView, SamplesView
+from constructor.views import RegisterView, GreetView, SampleView, SamplesView, ImageView
 from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -33,7 +33,9 @@ urlpatterns = [
     path('api/sample', SampleView.as_view(), name='sample'),
     path('api/sample/<int:id>', SampleView.as_view(), name='sample_get'),
     path('api/sample/list', SampleView.as_view(), name='sample_list'),
+    path('api/sample/state', SampleView.as_view(), name='sample_state'),
     path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/samples', SamplesView.as_view(), name='samples')
+    path('api/samples', SamplesView.as_view(), name='samples'),
+    path('api/image', ImageView.as_view(), name='image_save')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -64,3 +64,7 @@ class SampleUser(models.Model):
     user_id = models.ForeignKey(User, models.DO_NOTHING)
     sample = models.ForeignKey('Sample', models.DO_NOTHING)
 
+class Image(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='images/')
+
