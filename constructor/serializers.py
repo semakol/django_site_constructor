@@ -291,7 +291,7 @@ class SampleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sample
-        fields = ['sample_data', 'name', 'state', 'image', 'user_id' 'temp']
+        fields = ['sample_data', 'name', 'state', 'image', 'user_id', 'temp']
 
     def create(self, validated_data):
         if validated_data['temp']:
