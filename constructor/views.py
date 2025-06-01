@@ -84,6 +84,7 @@ class SampleView(APIView):
     def patch(self, request):
         path = request.path
         user = request.user
+        user_id = request.user.id
         sampleUser = SampleUser.objects.filter(user_id=user.id, sample=request.data["id"])
         if not sampleUser:
             return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -97,7 +98,7 @@ class SampleView(APIView):
                     "id": sample.id
                 }, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        serializer = SampleSerializer(data=request.data, instance=sample)
+        serializer = SampleSerializer(data=request.data.dict() | {"user_id": user_id}, instance=sample)
         if serializer.is_valid():
             serializer.save()
             return Response({

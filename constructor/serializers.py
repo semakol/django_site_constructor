@@ -334,6 +334,29 @@ class SampleSerializer(serializers.ModelSerializer):
         return sample
 
     def update(self, instance, validated_data):
+        if validated_data['temp']:
+            data = json.loads(validated_data['sample_data'])
+            for block in data:
+                if not block.get('data') and not block['data'].get('content'):
+                    continue
+                type = block.get('type')
+                sample = block.get('sample')
+                block['data']['content'] = CONTENT_SETTINGS[type][sample]['content']
+            vd_temp = json.dumps(data)
+            sample = Sample.objects.create(
+                name = validated_data['name'],
+                data = vd_temp,
+                state = 'temp',
+                image = validated_data['image'],
+                date_create = datetime.datetime.utcnow(),
+                date_update = datetime.datetime.utcnow()
+            )
+            user = User.objects.get(id=validated_data['user_id'])
+            sampleUser = SampleUser.objects.create(
+                relation = 'creator',
+                user_id = user,
+                sample = sample
+            )
         for key, item in validated_data.items():
             if key == 'sample_data':
                 setattr(instance, 'data', item)
