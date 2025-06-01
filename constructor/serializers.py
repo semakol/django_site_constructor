@@ -287,27 +287,14 @@ class SampleSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True, required=False, default='')
     sample_data = serializers.CharField(required=False)
     user_id = serializers.IntegerField(required=False)
+    temp = serializers.BooleanField(required=True)
 
     class Meta:
         model = Sample
-        fields = ['sample_data', 'name', 'state', 'image', 'user_id']
+        fields = ['sample_data', 'name', 'state', 'image', 'user_id' 'temp']
 
     def create(self, validated_data):
-        if validated_data['state'] == 'temp':
-            sample = Sample.objects.create(
-                name=validated_data['name'],
-                data=validated_data['sample_data'],
-                state='close',
-                image=validated_data['image'],
-                date_create=datetime.datetime.utcnow(),
-                date_update=datetime.datetime.utcnow()
-            )
-            user = User.objects.get(id=validated_data['user_id'])
-            sampleUser = SampleUser.objects.create(
-                relation='creator',
-                user_id=user,
-                sample=sample
-            )
+        if validated_data['temp']:
             data = json.loads(validated_data['sample_data'])
             for block in data:
                 if not block.get('data') and not block['data'].get('content'):
@@ -315,20 +302,34 @@ class SampleSerializer(serializers.ModelSerializer):
                 type = block.get('type')
                 sample = block.get('sample')
                 block['data']['content'] = CONTENT_SETTINGS[type][sample]['content']
-            validated_data['sample_data'] = json.dumps(data)
+            vd_temp = json.dumps(data)
+            sample = Sample.objects.create(
+                name = validated_data['name'],
+                data = vd_temp,
+                state = 'temp',
+                image = validated_data['image'],
+                date_create = datetime.datetime.utcnow(),
+                date_update = datetime.datetime.utcnow()
+            )
+            user = User.objects.get(id=validated_data['user_id'])
+            sampleUser = SampleUser.objects.create(
+                relation = 'creator',
+                user_id = user,
+                sample = sample
+            )
         sample = Sample.objects.create(
-            name = validated_data['name'],
-            data = validated_data['sample_data'],
-            state = validated_data['state'],
-            image = validated_data['image'],
-            date_create = datetime.datetime.utcnow(),
-            date_update = datetime.datetime.utcnow()
+            name=validated_data['name'],
+            data=validated_data['sample_data'],
+            state=validated_data['state'],
+            image=validated_data['image'],
+            date_create=datetime.datetime.utcnow(),
+            date_update=datetime.datetime.utcnow()
         )
         user = User.objects.get(id=validated_data['user_id'])
         sampleUser = SampleUser.objects.create(
-            relation = 'creator',
-            user_id = user,
-            sample = sample
+            relation='creator',
+            user_id=user,
+            sample=sample
         )
         return sample
 
