@@ -294,6 +294,20 @@ class SampleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if validated_data['state'] == 'temp':
+            sample = Sample.objects.create(
+                name=validated_data['name'],
+                data=validated_data['sample_data'],
+                state='close',
+                image=validated_data['image'],
+                date_create=datetime.datetime.utcnow(),
+                date_update=datetime.datetime.utcnow()
+            )
+            user = User.objects.get(id=validated_data['user_id'])
+            sampleUser = SampleUser.objects.create(
+                relation='creator',
+                user_id=user,
+                sample=sample
+            )
             data = json.loads(validated_data['sample_data'])
             for block in data:
                 if not block.get('data') and not block['data'].get('content'):
