@@ -288,10 +288,11 @@ class SampleSerializer(serializers.ModelSerializer):
     sample_data = serializers.CharField(required=False)
     user_id = serializers.IntegerField(required=False)
     temp = serializers.BooleanField(required=True)
+    temp_name = serializers.CharField(required=False)
 
     class Meta:
         model = Sample
-        fields = ['sample_data', 'name', 'state', 'image', 'user_id', 'temp']
+        fields = ['sample_data', 'name', 'state', 'image', 'user_id', 'temp', 'temp_name']
 
     def create(self, validated_data):
         if validated_data['temp']:
@@ -304,7 +305,7 @@ class SampleSerializer(serializers.ModelSerializer):
                 block['data']['content'] = CONTENT_SETTINGS[type][sample]['content']
             vd_temp = json.dumps(data)
             sample = Sample.objects.create(
-                name = validated_data['name'],
+                name = validated_data['temp_name'] if validated_data['temp_name'] else validated_data['name'],
                 data = vd_temp,
                 state = 'temp',
                 image = validated_data['image'],
@@ -344,10 +345,10 @@ class SampleSerializer(serializers.ModelSerializer):
                 block['data']['content'] = CONTENT_SETTINGS[type][sample]['content']
             vd_temp = json.dumps(data)
             sample = Sample.objects.create(
-                name = validated_data['name'],
+                name = validated_data['temp_name'] if validated_data['temp_name'] else validated_data['name'],
                 data = vd_temp,
                 state = 'temp',
-                image = validated_data['image'],
+                image = instance.image,
                 date_create = datetime.datetime.utcnow(),
                 date_update = datetime.datetime.utcnow()
             )
