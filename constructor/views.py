@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, viewsets, status
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -69,6 +69,11 @@ class AuthView(APIView):
 class SampleView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def post(self, request):
         user_id = request.user.id
