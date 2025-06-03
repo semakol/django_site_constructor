@@ -114,10 +114,10 @@ class SampleView(APIView):
 
     def get(self, request, id = None):
         if id:
-            user = request.user
-            sampleUser = SampleUser.objects.filter(user_id=user.id, sample=id)
-            if not sampleUser:
-                return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
+            # user = request.user
+            # sampleUser = SampleUser.objects.filter(user_id=user.id, sample=id)
+            # if not sampleUser:
+            #     return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
             sample = Sample.objects.get(id = id)
             response_data = {
                     "id": sample.id,
