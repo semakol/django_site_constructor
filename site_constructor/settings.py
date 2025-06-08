@@ -17,6 +17,11 @@ from pathlib import Path
 
 from datetime import timedelta
 
+import ssl
+import certifi
+
+ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
