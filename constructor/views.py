@@ -1,6 +1,12 @@
-from random import sample
+import json
+import random
 
+from django.conf import settings
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
@@ -12,11 +18,31 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from site_constructor.settings import EMAIL_HOST_USER
 from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer, ImageSerializer, SampleStateSerializer
 from .models import SampleUser, Sample, Image
 from django.contrib.auth.models import User
 
+signer = TimestampSigner()
 
+def send_verification_code(email):
+    code = f"{random.randint(100000, 999999)}"  # 6-значный код
+    cache.set(f'verify_code_{email}', code, timeout=300)  # 5 минут
+
+    send_mail(
+        subject="Ваш код подтверждения",
+        message=f"Ваш код подтверждения: {code}",
+        from_email=None,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+def verify_code(email, input_code):
+    saved_code = cache.get(f'verify_code_{email}')
+    if saved_code and input_code == saved_code:
+        cache.delete(f'verify_code_{email}')
+        return True
+    return False
 
 # class UserViewSet(viewsets.ModelViewSet):
     # queryset = User.objects.all()
@@ -50,20 +76,40 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
+            send_verification_code(request.data['email'])
+            cache.set(request.data['email'], json.dumps(request.data), timeout=300)
             return Response({
                 "user": {
-                    "username": user.username,
-                },
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
+                    "username": request.data['username'],
+                    "email": request.data['email']
+                }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class AuthView(APIView):
-    def get(self, request):
-        serializer = RegisterSerializer(data=request.data)
+class VerifyCodeView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        if not email or not code:
+            return Response({"error": "Email and code required"}, status=400)
+
+        if verify_code(email, code):
+            data = json.loads(cache.get(email))
+            serializer = RegisterSerializer(data=data)
+            if serializer.is_valid():
+                user = serializer.save()
+                refresh = RefreshToken.for_user(user)
+                return Response({"message": "Email подтверждён",
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "Неверный или просроченный код"}, status=400)
+
+
+# class AuthView(APIView):
+#     def get(self, request):
+#         serializer = RegisterSerializer(data=request.data)
 
 
 class SampleView(APIView):

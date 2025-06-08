@@ -270,16 +270,19 @@ class GreetSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, min_length=6)
     second_name = serializers.CharField(required=False, allow_null=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'first_name', 'last_name', 'second_name']
+        fields = ['username', 'password', 'first_name', 'last_name', 'second_name', 'email']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
         if validated_data.get('second_name'):
             validated_data['last_name'] = validated_data.pop('second_name')
         user = User.objects.create_user(password=password, **validated_data)
+        # user.is_active = False
+        user.save()
         return user
 
 

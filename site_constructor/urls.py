@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from constructor.views import RegisterView, GreetView, SampleView, SamplesView, ImageView
+from constructor.views import RegisterView, GreetView, SampleView, SamplesView, ImageView,\
+    VerifyCodeView
 from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -30,6 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('greet', GreetView.as_view(), name='greet'),
     path('api/register', RegisterView.as_view(), name='register'),
+    path('api/verify-email', VerifyCodeView.as_view(), name='verify-email'),
     path('api/sample', SampleView.as_view(), name='sample'),
     path('api/sample/<int:id>', SampleView.as_view(), name='sample_get'),
     path('api/sample/list', SampleView.as_view(), name='sample_list'),
