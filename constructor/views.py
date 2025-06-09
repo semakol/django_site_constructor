@@ -140,6 +140,8 @@ class SampleView(APIView):
         if not sampleUser:
             return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
         sample = Sample.objects.get(id=request.data["id"])
+        if sample.state == 'open' and sample.is_template == True:
+            return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
         if 'state' in path:
             serializer = SampleStateSerializer(data=request.data, instance=sample)
             if serializer.is_valid():
@@ -169,21 +171,22 @@ class SampleView(APIView):
                     "id": sample.id,
                     "name": sample.name,
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
-                    "state": sample.state,
+                    "state": "temp" if sample.is_template else sample.state,
                     "sample_data": sample.data
                 }
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             user = request.user
             samples = Sample.objects.filter(sampleuser__user_id=user.id)
+            open_templates = Sample.objects.filter(state='open', is_template=True)
             response_data = [
                 {
                     "id": sample.id,
                     "name": sample.name,
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
-                    "state": sample.state,
+                    "state": "temp" if sample.is_template else sample.state,
                 }
-                for sample in samples
+                for sample in samples | open_templates
             ]
             return Response(response_data, status=status.HTTP_200_OK)
 
@@ -195,7 +198,7 @@ class SamplesView(APIView):
                 "id": sample.id,
                 "name": sample.name,
                 "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
-                "state": sample.state
+                "state": "temp" if sample.is_template else sample.state
             }
             for sample in samples
         ]

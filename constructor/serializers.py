@@ -315,10 +315,11 @@ class SampleSerializer(serializers.ModelSerializer):
             sample = Sample.objects.create(
                 name = validated_data['temp_name'] if validated_data['temp_name'] else validated_data['name'],
                 data = vd_temp,
-                state = 'temp',
+                state = 'close',
                 image = validated_data['image'],
                 date_create = datetime.datetime.utcnow(),
-                date_update = datetime.datetime.utcnow()
+                date_update = datetime.datetime.utcnow(),
+                is_template = True
             )
             user = User.objects.get(id=validated_data['user_id'])
             sampleUser = SampleUser.objects.create(
@@ -355,10 +356,11 @@ class SampleSerializer(serializers.ModelSerializer):
             sample = Sample.objects.create(
                 name = validated_data['temp_name'] if validated_data['temp_name'] else validated_data['name'],
                 data = vd_temp,
-                state = 'temp',
+                state = 'close',
                 image = instance.image,
                 date_create = datetime.datetime.utcnow(),
-                date_update = datetime.datetime.utcnow()
+                date_update = datetime.datetime.utcnow(),
+                is_template = True
             )
             user = User.objects.get(id=validated_data['user_id'])
             sampleUser = SampleUser.objects.create(

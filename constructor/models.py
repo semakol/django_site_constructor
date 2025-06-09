@@ -8,8 +8,7 @@ from django.db import models
 sample_states = (
     ('open', 'Опубликована'),
     ('close', 'Закрыта'),
-    ('delete', 'Удалена'),
-    ('temp', 'Шаблон')
+    ('delete', 'Удалена')
 )
 
 class Sample(models.Model):
@@ -20,6 +19,7 @@ class Sample(models.Model):
     date_create = models.DateTimeField()
     date_update = models.DateTimeField(null=True)
     image = models.ImageField(upload_to='images/', null=True)
+    is_template = models.BooleanField(default=False)
 
 # roles = (
 #     ('redactor', 'Редактор'),
