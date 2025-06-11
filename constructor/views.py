@@ -185,6 +185,7 @@ class SampleView(APIView):
                     "name": sample.name,
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
                     "state": "temp" if sample.is_template else sample.state,
+                    "deletable": not (sample.is_template and sample.state == 'open')
                 }
                 for sample in sorted(samples | open_templates, key = lambda x: x.id)
             ]
