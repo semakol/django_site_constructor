@@ -177,7 +177,7 @@ class SampleView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             user = request.user
-            samples = Sample.objects.filter(sampleuser__user_id=user.id)
+            samples = Sample.objects.filter(sampleuser__user_id=user.id, state__in=['open', 'close'])
             open_templates = Sample.objects.filter(state='open', is_template=True)
             response_data = [
                 {
