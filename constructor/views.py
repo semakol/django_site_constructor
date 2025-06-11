@@ -186,13 +186,13 @@ class SampleView(APIView):
                     "image": sample.image.url if sample.image and hasattr(sample.image, 'url') else None,
                     "state": "temp" if sample.is_template else sample.state,
                 }
-                for sample in samples | open_templates
+                for sample in sorted(samples | open_templates, key = lambda x: x.id)
             ]
             return Response(response_data, status=status.HTTP_200_OK)
 
 class SamplesView(APIView):
     def get(self, request):
-        samples = Sample.objects.filter(state='open').all()
+        samples = Sample.objects.filter(state='open', is_template=False).order_by("id").all()
         response_data = [
             {
                 "id": sample.id,
