@@ -11,14 +11,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics, viewsets, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from site_constructor.settings import EMAIL_HOST_USER
+from .permissions import OptionalAuthenticationPermission
 from .serializers import GreetSerializer, RegisterSerializer, SampleSerializer, ImageSerializer, SampleStateSerializer
 from .models import SampleUser, Sample, Image
 from django.contrib.auth.models import User
@@ -113,13 +116,14 @@ class VerifyCodeView(APIView):
 
 
 class SampleView(APIView):
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    permission_classes = [OptionalAuthenticationPermission]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
+    #     return [IsAuthenticated()]
 
     def post(self, request):
         user_id = request.user.id
@@ -162,11 +166,16 @@ class SampleView(APIView):
 
     def get(self, request, id = None):
         if id:
-            # user = request.user
-            # sampleUser = SampleUser.objects.filter(user_id=user.id, sample=id)
-            # if not sampleUser:
-            #     return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
-            sample = Sample.objects.get(id = id)
+            if request.user.is_authenticated:
+                user = request.user
+                sampleUser = SampleUser.objects.filter(user_id=user.id, sample=id)
+                sample = Sample.objects.get(id = id)
+                if not sampleUser and not sample.state == 'open':
+                    return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                sample = Sample.objects.filter(id=id, state='open').first()
+                if not sample:
+                    return Response(data={'Not allowed user'}, status=status.HTTP_401_UNAUTHORIZED)
             response_data = {
                     "id": sample.id,
                     "name": sample.name,
